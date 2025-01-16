@@ -12,6 +12,7 @@ An AI-powered chatbot that provides information about Jupiter's moons using Lang
 - Python 3.8+
 - OpenAI API key
 - Pinecone API key
+- Galileo API key (for evaluation)
 
 ## Installation
 1. Clone the repository:

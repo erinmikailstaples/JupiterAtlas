@@ -7,9 +7,12 @@ from pinecone import Pinecone
 from dotenv import load_dotenv
 import os
 from langchain.globals import set_debug
-from typing import Dict, Any
+from typing import Dict, Any, List
 import logging
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from galileo_observe import ObserveWorkflows
+import uuid
+from dataclasses import dataclass
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,6 +20,81 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
+
+@dataclass
+class Message:
+    role: str
+    content: str
+    metadata: Dict[str, Any] = None
+
+class JupiterObserver:
+    def __init__(self):
+        self.observe_logger = ObserveWorkflows(project_name="JupiterAtlasObs")
+        self.current_workflow = None
+        self.thread_id = str(uuid.uuid4())
+        self._initialized = False
+    
+    def init_workflow(self) -> bool:
+        try:
+            if not self._initialized:
+                galileo_api_key = os.getenv("GALILEO_API_KEY")
+                if not galileo_api_key:
+                    logger.error("❌ Galileo API key not found")
+                    return False
+                
+                self._initialized = True
+                logger.info("✅ Galileo workflow initialized")
+            return True
+        except Exception as e:
+            logger.error(f"❌ Error initializing Galileo workflow: {str(e)}")
+            return False
+    
+    def process_interaction(self, question: str, context: List[str], 
+                          response: Dict[str, Any], messages: List[Message]) -> None:
+        try:
+            self.current_workflow = self.observe_logger.add_workflow(
+                input={"question": question},
+                metadata={
+                    "thread_id": self.thread_id,
+                    "message_count": len(messages)
+                }
+            )
+            
+            if context:
+                self.current_workflow.add_retriever(
+                    input=question,
+                    documents=[{
+                        "content": str(doc),
+                        "metadata": {"source": "jupiter_moons"}
+                    } for doc in context]
+                )
+            
+            self.current_workflow.add_llm(
+                input={
+                    "messages": [{"role": m.role, "content": m.content} 
+                               for m in messages],
+                    "question": question
+                },
+                output={"answer": response.get("answer", "")},
+                model="gpt-4",
+                metadata={
+                    "env": "production",
+                    "thread_id": self.thread_id
+                }
+            )
+            
+            self.current_workflow.conclude(
+                output={
+                    "final_answer": response.get("answer", ""),
+                    "context_used": bool(context)
+                }
+            )
+            
+            self.observe_logger.upload_workflows()
+            logger.info(f"✅ Workflow completed and uploaded for thread {self.thread_id}")
+            
+        except Exception as e:
+            logger.error(f"❌ Error processing interaction: {str(e)}")
 
 def init_chatbot(
     temperature: float = 0.0,
@@ -95,7 +173,18 @@ def init_chatbot(
 def chat_with_moons():
     """Interactive chat function about Jupiter's moons with enhanced error handling and user experience."""
     try:
+        # Initialize components
         chain = init_chatbot()
+        observer = JupiterObserver()
+        galileo_enabled = observer.init_workflow()
+        
+        # Track conversation history
+        messages = []
+        
+        if galileo_enabled:
+            print("\n✅ Galileo observation enabled")
+        else:
+            print("\n❌ Galileo observation disabled - check your API key")
         
         print("\n🌔 Welcome to the Jupiter Moons Chatbot! 🌔")
         print("Ask me anything about Jupiter's moons (type 'quit' to exit)")
@@ -111,11 +200,31 @@ def chat_with_moons():
                 if not question:
                     print("Please enter a valid question!")
                     continue
-                    
+                
+                # Add user message to history
+                messages.append(Message(role="user", content=question))
+                
+                # Get response
                 response = chain.invoke({
                     "input": question,
-                    "chat_history": []  # Add empty chat history
+                    "chat_history": []
                 })
+                
+                # Add assistant message to history
+                messages.append(Message(
+                    role="assistant", 
+                    content=response["answer"],
+                    metadata={"context_used": bool(response.get("context"))}
+                ))
+                
+                # Log to Galileo if enabled
+                if galileo_enabled:
+                    observer.process_interaction(
+                        question=question,
+                        context=response.get("context", []),
+                        response=response,
+                        messages=messages
+                    )
                 
                 print("\nAnswer:", response["answer"])
                 

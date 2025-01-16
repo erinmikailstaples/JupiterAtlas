@@ -9,6 +9,8 @@ charset-normalizer==3.4.1
 dataclasses-json==0.6.7
 distro==1.9.0
 frozenlist==1.5.0
+galileo-core==2.34.0
+galileo-observe==1.18.0
 h11==0.14.0
 httpcore==1.0.7
 httpx==0.28.1
@@ -36,9 +38,12 @@ pinecone==5.4.2
 pinecone-plugin-inference==3.1.0
 pinecone-plugin-interface==0.0.7
 pluggy==1.5.0
+promptquality==1.0.0
 propcache==0.2.1
 pydantic==2.10.5
 pydantic-core==2.27.2
+pydantic-settings==2.7.1
+pyjwt==2.10.1
 pytest==8.3.4
 pytest-asyncio==0.25.2
 pytest-socket==0.7.0
