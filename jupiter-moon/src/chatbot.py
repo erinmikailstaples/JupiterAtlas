@@ -81,17 +81,20 @@ class JupiterObserver:
                     } for doc in context]
                 )
             
+            # Convert messages list to a formatted string
+            messages_str = "\n".join([
+                f"{msg.role}: {msg.content}" 
+                for msg in messages
+            ])
+            
             self.current_workflow.add_llm(
-                input={
-                    "messages": [{"role": m.role, "content": m.content} 
-                               for m in messages],
-                    "question": question
-                },
-                output={"answer": response.get("answer", "")},
+                input=question,
+                output=response.get("answer", ""),
                 model="gpt-4",
                 metadata={
                     "env": "production",
-                    "thread_id": self.thread_id
+                    "thread_id": self.thread_id,
+                    "messages": messages_str  # Now a string instead of a list
                 }
             )
             
