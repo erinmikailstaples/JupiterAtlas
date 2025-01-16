@@ -17,8 +17,10 @@ An AI-powered chatbot that provides information about Jupiter's moons using Lang
 ## Installation
 1. Clone the repository:
 
-```git clone https://github.com/erinmikailstaples/jupiter-moons-chatbot.git
-cd jupiter-moons-chatbot```
+```git clone https://github.com/erinmikailstaples/JupiterAtlas.git```
+
+navigate into the correct directory
+```cd backend```
 
 2. Create a virtual environment using uv:
 
@@ -37,8 +39,9 @@ cd jupiter-moons-chatbot```
 
 ## Configuration
 
-1. Update your .env file with your API keys (reference: example.env, startLine: 1, endLine: 3)
-2. The chatbot uses the following default settings (reference: chatbot.py, startLine: 22, endLine: 24):
+1. Update your .env file with the respective secrets
+
+2. The chatbot uses the following default settings:
    - Index Name: "jupitermoons-2"
    - Namespace: "moonvector"
 
