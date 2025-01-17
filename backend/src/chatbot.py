@@ -9,7 +9,7 @@ import os
 from langchain.globals import set_debug
 from typing import Dict, Any, List, Optional
 import logging
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, BaseMessage
 from galileo_observe import ObserveWorkflows
 import uuid
 from pydantic import BaseModel
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-class Message(BaseModel):
+class Message(BaseMessage):
     role: str
     content: str
     metadata: Optional[Dict[str, Any]] = None

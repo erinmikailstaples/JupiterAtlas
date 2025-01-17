@@ -56,10 +56,13 @@ async def chat(request: ChatRequest) -> ChatResponse:
             
         # Log incoming request
         logger.info(f"Received chat request: {request.question}")
+        
+        # Convert messages to LangChain format
+        langchain_messages = [Message(role=msg.role, content=msg.content, metadata=msg.metadata) for msg in request.messages]
             
         response = chain.invoke({
             "input": request.question,
-            "chat_history": request.messages
+            "chat_history": langchain_messages
         })
         
         if not response or "answer" not in response:
