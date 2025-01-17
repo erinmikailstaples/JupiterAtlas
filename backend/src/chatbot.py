@@ -12,6 +12,7 @@ import logging
 from galileo_observe import ObserveWorkflows
 import uuid
 from pydantic import BaseModel
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
