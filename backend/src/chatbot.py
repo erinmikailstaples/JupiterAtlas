@@ -7,12 +7,12 @@ from pinecone import Pinecone
 from dotenv import load_dotenv
 import os
 from langchain.globals import set_debug
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 import logging
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from galileo_observe import ObserveWorkflows
 import uuid
-from dataclasses import dataclass
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,11 +21,10 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-@dataclass
-class Message:
+class Message(BaseModel):
     role: str
     content: str
-    metadata: Dict[str, Any] = None
+    metadata: Optional[Dict[str, Any]] = None
 
 class JupiterObserver:
     _instance = None
