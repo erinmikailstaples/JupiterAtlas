@@ -62,7 +62,7 @@ class JupiterObserver:
             return False
     
     def process_interaction(self, question: str, context: List[str], 
-                          response: Dict[str, Any], messages: List[Message]) -> None:
+                            response: Dict[str, Any], messages: List[Message]) -> None:
         try:
             self.current_workflow = self.observe_logger.add_workflow(
                 input={"question": question},
