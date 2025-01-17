@@ -42,8 +42,12 @@ class Message(BaseModel):
     metadata: Optional[Dict[str, Any]] = None
 
 # Example of using MessageLikeRepresentation
-def create_message(role: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> MessageLikeRepresentation:
-    return (role, content, metadata or {})
+def create_message(role: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    return {
+        "role": role,
+        "content": content,
+        "metadata": metadata or {}
+    }
 
 class JupiterObserver:
     _instance = None
