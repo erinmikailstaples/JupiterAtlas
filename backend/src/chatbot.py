@@ -7,12 +7,17 @@ from pinecone import Pinecone
 from dotenv import load_dotenv
 import os
 from langchain.globals import set_debug
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Union
 import logging
 from galileo_observe import ObserveWorkflows
 import uuid
 from pydantic import BaseModel
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.prompts.chat import (
+    BaseChatPromptTemplate,
+    BaseMessage,
+    BaseMessagePromptTemplate,
+)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,11 +26,24 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
+MessageLikeRepresentation = Union[
+    Union[BaseMessagePromptTemplate, BaseMessage, BaseChatPromptTemplate],
+    tuple[
+        Union[str, type],
+        Union[str, list[dict], list[object]],
+    ],
+    str,
+]
+
 # Define the Message class using Pydantic's BaseModel
 class Message(BaseModel):
     role: str
     content: str
     metadata: Optional[Dict[str, Any]] = None
+
+# Example of using MessageLikeRepresentation
+def create_message(role: str, content: str, metadata: Optional[Dict[str, Any]] = None) -> MessageLikeRepresentation:
+    return (role, content, metadata or {})
 
 class JupiterObserver:
     _instance = None
@@ -136,6 +154,12 @@ def init_chatbot():
             prompt,
             document_variable_name="context"
         )
+        
+        # Use create_message to ensure compatibility with MessageLikeRepresentation
+        messages = [
+            create_message("system", "You are an expert on Jupiter's moons."),
+            create_message("human", "What is the largest moon of Jupiter?")
+        ]
         
         return create_retrieval_chain(retriever, combine_docs_chain)
     except Exception as e:
