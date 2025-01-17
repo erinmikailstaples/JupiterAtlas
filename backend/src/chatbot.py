@@ -26,6 +26,7 @@ class Message:
     role: str
     content: str
     metadata: Dict[str, Any] = None
+
 class JupiterObserver:
     _instance = None
     _workflow = None
@@ -59,7 +60,7 @@ class JupiterObserver:
         except Exception as e:
             logger.error(f"❌ Error initializing Galileo workflow: {str(e)}")
             return False
-    
+
     def process_interaction(self, question: str, context: List[str], 
                             response: Dict[str, Any], messages: List[Message]) -> None:
         try:
@@ -106,7 +107,6 @@ class JupiterObserver:
             
             self.observe_logger.upload_workflows()
             logger.info(f"✅ Workflow completed and uploaded for thread {self.thread_id}")
-            
         except Exception as e:
             logger.error(f"❌ Error processing interaction: {str(e)}")
 
@@ -153,7 +153,6 @@ def init_chatbot():
         )
         
         return create_retrieval_chain(retriever, combine_docs_chain)
-        
     except Exception as e:
         logger.error(f"Error initializing chatbot: {str(e)}")
         raise RuntimeError(f"Failed to initialize chatbot: {str(e)}")

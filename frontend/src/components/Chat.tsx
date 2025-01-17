@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useRef } from 'react'
-import { Message } from '../types/chat'
+import { Message, ChatRequest, ChatResponse } from '../types/chat'
 import { sendMessage } from '../lib/api'
 import axios from 'axios'
 
@@ -33,7 +33,12 @@ export default function Chat() {
       setMessages(prev => [...prev, userMessage])
       setInput('')
 
-      const response = await sendMessage(input, messages)
+      const chatRequest: ChatRequest = {
+        question: input,
+        messages: messages
+      }
+
+      const response: ChatResponse = await sendMessage(chatRequest)
       
       const botMessage: Message = {
         role: 'assistant',
