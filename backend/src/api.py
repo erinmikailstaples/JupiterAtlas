@@ -58,7 +58,9 @@ async def chat(request: ChatRequest) -> ChatResponse:
         logger.info(f"Received chat request: {request.question}")
         
         # Convert messages to LangChain format
-        langchain_messages = [Message(role=msg.role, content=msg.content, metadata=msg.metadata) for msg in request.messages]
+        langchain_messages = [
+            create_message(msg.role, msg.content, msg.metadata) for msg in request.messages
+        ]
             
         response = chain.invoke({
             "input": request.question,
