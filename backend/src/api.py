@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
 import logging
-from .chatbot import init_chatbot, Message, JupiterObserver
+from .chatbot import init_chatbot, Message, JupiterObserver, create_message
 
 app = FastAPI(title="Jupiter Moons API")
 
