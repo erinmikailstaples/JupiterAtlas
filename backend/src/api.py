@@ -59,7 +59,7 @@ async def chat(request: ChatRequest) -> ChatResponse:
             
         response = chain.invoke({
             "input": request.question,
-            "chat_history": []
+            "chat_history": request.messages
         })
         
         if not response or "answer" not in response:
@@ -71,6 +71,15 @@ async def chat(request: ChatRequest) -> ChatResponse:
         
         # Convert Document objects to strings for the context
         context_strings = [str(doc) for doc in response.get("context", [])]
+        
+        # Log to Galileo if enabled
+        if galileo_enabled:
+            observer.process_interaction(
+                question=request.question,
+                context=context_strings,
+                response=response,
+                messages=request.messages
+            )
         
         return ChatResponse(
             answer=response["answer"],

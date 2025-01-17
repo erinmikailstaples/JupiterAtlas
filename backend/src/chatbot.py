@@ -26,7 +26,6 @@ class Message:
     role: str
     content: str
     metadata: Dict[str, Any] = None
-
 class JupiterObserver:
     _instance = None
     _workflow = None
