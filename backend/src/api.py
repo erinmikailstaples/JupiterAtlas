@@ -1,7 +1,8 @@
-from fastapi import FastAPI, HTTPException, logger
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+import logging
 from .chatbot import init_chatbot, Message, JupiterObserver
 
 app = FastAPI(title="Jupiter Moons API")
@@ -19,6 +20,10 @@ app.add_middleware(
 chain = init_chatbot()
 observer = JupiterObserver()
 galileo_enabled = observer.init_workflow()
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @app.get("/")
 async def root():
