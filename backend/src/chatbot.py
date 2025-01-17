@@ -9,7 +9,6 @@ import os
 from langchain.globals import set_debug
 from typing import Dict, Any, List, Optional
 import logging
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, BaseMessage
 from galileo_observe import ObserveWorkflows
 import uuid
 from pydantic import BaseModel
@@ -21,7 +20,8 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 
-class Message(BaseMessage):
+# Define the Message class using Pydantic's BaseModel
+class Message(BaseModel):
     role: str
     content: str
     metadata: Optional[Dict[str, Any]] = None
@@ -89,25 +89,10 @@ class JupiterObserver:
             self.current_workflow.add_llm(
                 input=question,
                 output=response.get("answer", ""),
-                model="gpt-4",
-                metadata={
-                    "env": "production",
-                    "thread_id": self.thread_id,
-                    "messages": messages_str  # Now a string instead of a list
-                }
+                messages=messages_str
             )
-            
-            self.current_workflow.conclude(
-                output={
-                    "final_answer": response.get("answer", ""),
-                    "context_used": bool(context)
-                }
-            )
-            
-            self.observe_logger.upload_workflows()
-            logger.info(f"✅ Workflow completed and uploaded for thread {self.thread_id}")
         except Exception as e:
-            logger.error(f"❌ Error processing interaction: {str(e)}")
+            logger.error(f"Error processing interaction: {str(e)}")
 
 def init_chatbot():
     """Initialize the chatbot with better error handling"""
