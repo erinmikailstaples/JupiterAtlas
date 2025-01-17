@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { Message, ChatRequest, ChatResponse } from '../types/chat';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/',
+  baseURL: 'https://jupiteratlas.onrender.com/',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
