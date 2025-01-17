@@ -69,9 +69,12 @@ async def chat(request: ChatRequest) -> ChatResponse:
                 detail="Invalid response from chatbot"
             )
         
+        # Convert Document objects to strings for the context
+        context_strings = [str(doc) for doc in response.get("context", [])]
+        
         return ChatResponse(
             answer=response["answer"],
-            context=response.get("context", [])
+            context=context_strings
         )
         
     except Exception as e:
