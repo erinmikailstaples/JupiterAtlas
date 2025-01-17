@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Message } from '../types/chat'
 import { sendMessage } from '../lib/api'
+import axios from 'axios'
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([{
@@ -33,9 +34,15 @@ export default function Chat() {
       setMessages(prev => [...prev, botMessage])
     } catch (error) {
       console.error('Error:', error)
+
+      let errorMessage = "ERROR: Connection to Jupiter database failed. Please retry."
+      if (axios.isAxiosError(error) && error.response) {
+        errorMessage = `ERROR: ${error.response.data.detail || errorMessage}`
+      }
+
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "ERROR: Connection to Jupiter database failed. Please retry.",
+        content: errorMessage,
       }])
     } finally {
       setLoading(false)
